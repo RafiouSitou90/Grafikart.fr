@@ -1,6 +1,6 @@
 {
   "name": "Grafikart.fr",
-  "version": "1.0.4",
+  "version": "1.0.8",
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
@@ -63,15 +63,14 @@
     }
   },
   "jest": {
-    "moduleNameMapper": {
-      "/functions/(.*)$": "<rootDir>/../../assets/functions/$1",
-      "/elements/(.*)$": "<rootDir>/../../assets/elements/$1"
-    },
     "moduleDirectories": [
       "node_modules",
-      "bower_components",
       "assets"
     ],
+    "moduleNameMapper": {
+      "^/functions/(.*)$": "<rootDir>/../../assets/functions/$1",
+      "^/elements/(.*)$": "<rootDir>/../../assets/elements/$1"
+    },
     "rootDir": "tests/js"
   }
 }

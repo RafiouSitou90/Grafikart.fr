@@ -2,9 +2,9 @@
 
 namespace App\Infrastructure\Search\Typesense;
 
-use App\Infrastructure\Search\SearchResultItem;
+use App\Infrastructure\Search\SearchResultItemInterface;
 
-class TypesenseItem implements SearchResultItem
+class TypesenseItem implements SearchResultItemInterface
 {
     /**
      * An item store by typesense.
@@ -44,7 +44,7 @@ class TypesenseItem implements SearchResultItem
         // Si un extrait est souligné on prend la ligne qui correspond
         foreach ($this->item['highlights'] as $highlight) {
             if ('content' === $highlight['field']) {
-                $lines = preg_split("/((\r?\n)|(\r\n?))/", $highlight['value']);
+                $lines = preg_split("/((\r?\n)|(\r\n?)|(\.\s))/", $highlight['value']);
                 if ($lines) {
                     foreach ($lines as $line) {
                         if (false !== strpos($line, '<mark>')) {
