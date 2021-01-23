@@ -1,4 +1,4 @@
-{% cache [course, 'card'] %}
+{% cache [course] %}
   <article class="card {{ course.premium ? 'card-premium' : '' }} {{ course.scheduled ? 'card-scheduled' : '' }}" data-history="{{ course.id }}">
     <div class="card__body stack">
 
@@ -21,7 +21,7 @@
       {# Description courte #}
       <div class="card__description text-small">
         <p>
-          {{ course.content | markdown | striptags | excerpt(130) }}
+          {{ course.content | markdown | striptags | excerpt(130) | raw }}
         </p>
         {% if course.scheduled %}
           <div class="countdown">
@@ -53,7 +53,7 @@
       {% include 'partials/level.html.twig' with {content: course, small: true} %}
 
       {% if course.premium %}
-        <div class="pill pill-xsmall pill-yellow">{{ icon('star') }} Premium</div>
+        <div class="pill small pill-yellow uppercase">{{ icon('star') }} Premium</div>
       {% endif %}
     </div>
   </article>

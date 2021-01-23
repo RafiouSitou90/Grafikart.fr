@@ -22,23 +22,23 @@
         {% for row in rows %}
         <tr>
           <td>{{ row.createdAt.format('d/m/Y') }}</td>
-          <td>{{ row.total | format_currency('EUR') }}</td>
+          <td>{{ row.price | format_currency('EUR') }}</td>
           <td>{{ row.author.username }}</td>
           <td>{{ row.author.email }}</td>
           <td>
             {% if row.paypal %}
-            <a class="pill pill-small pill-yellow" href="https://www.paypal.com/myaccount/transactions/?free_text_search={{ row.methodRef }}&account_subscription_type=ALL&filter_id=&currency=ALL&issuance_product_name=&asset_names=&asset_symbols=&type=&status=&start_date=2010-07-09&end_date=2120-10-07">
+            <a class="pill uppercase pill-yellow" href="https://www.paypal.com/myaccount/transactions/?free_text_search={{ row.methodRef }}&account_subscription_type=ALL&filter_id=&currency=ALL&issuance_product_name=&asset_names=&asset_symbols=&type=&status=&start_date=2010-07-09&end_date=2120-10-07">
               {{ row.method }}
             </a>
             {% elseif row.stripe %}
-              <a class="pill pill-small" href="https://dashboard.stripe.com/payments/{{ row.methodRef }}">
+              <a class="pill uppercase" href="https://dashboard.stripe.com/payments/{{ row.methodRef }}">
                 {{ row.method }}
               </a>
             {% endif %}
           </td>
           <td>{{ row.duration }}</td>
           <td class="text-right">
-            <form action="{{ path(prefix ~ '_show', {id: row.id}) }}" method="post" onsubmit="return confirm('Voulez vous vraiment marquer cette transaction comme remboursée ?')">
+            <form action="{{ path(prefix ~ '_show', {id: row.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment marquer cette transaction comme remboursée ?')">
               <input type="hidden" name="_method" value="DELETE">
               <button class="btn-danger" type="submit" {{ row.refunded ? 'disabled' : '' }}>
                 {{ icon('refund') }} Rembourser

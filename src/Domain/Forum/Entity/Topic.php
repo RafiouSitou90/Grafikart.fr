@@ -67,7 +67,7 @@ class Topic implements SpammableInterface, CacheableInterface
      * @ORM\ManyToMany(targetEntity="App\Domain\Forum\Entity\Tag", inversedBy="topics")
      * @ORM\JoinTable(name="forum_topic_tag")
      * @Assert\NotBlank()
-     * @Assert\Count(min="1")
+     * @Assert\Count(min="1", max="3")
      * @Groups({"read:topic"})
      */
     private Collection $tags;
@@ -85,12 +85,13 @@ class Topic implements SpammableInterface, CacheableInterface
 
     /**
      * @ORM\OneToMany(targetEntity="App\Domain\Forum\Entity\Message", mappedBy="topic")
+     * @ORM\OrderBy({"accepted" = "DESC", "createdAt" = "ASC"})
      */
     private Collection $messages;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Domain\Forum\Entity\Message")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      */
     private ?Message $lastMessage = null;
 
@@ -119,9 +120,9 @@ class Topic implements SpammableInterface, CacheableInterface
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(?string $name): self
     {
-        $this->name = $name;
+        $this->name = $name ?: '';
 
         return $this;
     }
@@ -131,9 +132,9 @@ class Topic implements SpammableInterface, CacheableInterface
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    public function setContent(?string $content): self
     {
-        $this->content = $content;
+        $this->content = $content ?: '';
 
         return $this;
     }

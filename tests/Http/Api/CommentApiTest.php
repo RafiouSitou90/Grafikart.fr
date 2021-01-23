@@ -42,7 +42,7 @@ class CommentApiTest extends ApiTestCase
     public function testCreateWithBadData()
     {
         $fixtures = $this->loadFixtures(['comments']);
-        $this->client->request('POST', '/api/comments', [
+        $response = $this->client->request('POST', '/api/comments', [
             'json' => [
                 'content' => 'Hello world !',
                 'email' => 'johnfake',
@@ -55,6 +55,28 @@ class CommentApiTest extends ApiTestCase
             'violations' => [[
                 'propertyPath' => 'email',
             ]],
+        ]);
+    }
+
+    public function testCreateWithEmptyComment()
+    {
+        $fixtures = $this->loadFixtures(['comments']);
+        $this->client->request('POST', '/api/comments', [
+            'json' => [
+                'content' => '         ',
+                'email' => 'john@fake.fr',
+                'username' => '        ',
+                'target' => $fixtures['post1']->getId(),
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertJsonContains([
+            'violations' => [[
+                'propertyPath' => 'content',
+            ],
+                [
+                    'propertyPath' => 'content',
+                ], ],
         ]);
     }
 
@@ -105,6 +127,14 @@ class CommentApiTest extends ApiTestCase
         $this->login($fixtures['user1']);
         $this->client->request('DELETE', "/api/comments/{$comment->getId()}");
         $this->assertResponseIsSuccessful();
+    }
+
+    public function testDeleteWithBadId()
+    {
+        ['user1' => $user] = $this->loadFixtures(['users']);
+        $this->login($user);
+        $this->client->request('DELETE', '/api/comments/100');
+        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
     public function testUpdateWithBadAuth()

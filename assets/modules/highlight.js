@@ -9,6 +9,7 @@ const lazylangs = ['typescript', 'elixir', 'less', 'stylus', 'scss', 'sass', 'ya
  */
 function highlight ($codes) {
   $codes.forEach(code => {
+    code.parentNode.classList.add('with-syntax')
     let lazy = false
     let cls = code.getAttribute('class')
     if (cls === null) {
@@ -33,8 +34,8 @@ function highlight ($codes) {
 /**
  * Détecte et ajoute la coloration syntaxique sur le site
  */
-function bindHighlight () {
-  const $codes = document.querySelectorAll('pre code')
+export function bindHighlight (root = document) {
+  const $codes = root.querySelectorAll('pre code')
   if ($codes.length > 0) {
     if (window.hljs) {
       highlight($codes)

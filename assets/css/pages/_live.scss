@@ -54,6 +54,11 @@
 .live-recap__header {
   font-size: 18px;
   margin-bottom: space(4);
+
+  .has-player & {
+    height: 100px;
+    overflow: hidden;
+  }
 }
 .live-recap__header > * + * {
   margin-top: space(4);
@@ -148,7 +153,7 @@
 .live__image::before {
   z-index: 2;
   opacity: 0.8;
-  background: url(..//images/play.svg) center center / 20px 20px no-repeat;
+  background: url(../images/play.svg) center center / 20px 20px no-repeat;
 }
 .live__image img {
   width: 100%;

@@ -44,11 +44,11 @@ class PasswordController extends AbstractController
     }
 
     /**
-     * @Route("/password/new/{id}/{token}", name="auth_password_reset_confirm")
+     * @Route("/password/new/{id<\d+>}/{token}", name="auth_password_reset_confirm")
      */
-    public function confirm(Request $request, User $user, PasswordResetToken $token, PasswordService $service): Response
+    public function confirm(Request $request, User $user, ?PasswordResetToken $token, PasswordService $service): Response
     {
-        if ($service->isExpired($token) || $token->getUser() !== $user) {
+        if (!$token || $service->isExpired($token) || $token->getUser() !== $user) {
             $this->addFlash('error', 'Ce token a expiré');
 
             return $this->redirectToRoute('auth_login');

@@ -12,6 +12,12 @@
   display: none;
 }
 
+@media (max-height: 700px) and (min-width: 1000px) {
+  .home-intro {
+    padding-top: calc(var(--padding) * .6);
+  }
+}
+
 @include up(1000) {
   .homepage {
     --padding: 120px;
@@ -30,9 +36,15 @@
   .home-intro__mascot {
     position: absolute;
     bottom: -120px;
-    right: -280px;
+    right: -100px;
     width: 472px;
     height: 460px;
+  }
+}
+
+@include up(1330) {
+  .home-intro__mascot {
+    right: -280px;
   }
 }
 
@@ -162,6 +174,18 @@
   padding: space(4) space(3);
 }
 
+.home-list__item .card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.home-list__item > *:last-child {
+  margin-top: 3px;
+  color: var(--color-light);
+}
+
 .home-list__item.has-icon {
   position: relative;
   padding-left: 64px;
@@ -181,41 +205,34 @@
 
 .home-push__mosaic {
   display: grid;
-  grid-gap: 20px;
+  grid-gap: space(6);
 }
 
-.home-push__mosaic .badge-rounded {
-  position: absolute;
-  right: space(3);
-  bottom: 0;
-  transform: translateY(50%);
-}
-
-.home-push__mosaic > *:nth-child(1) .badge-rounded {
+.home-push__mosaic .pill {
   position: absolute;
   left: space(3);
   top: 0;
-  bottom: auto;
-  right: auto;
   transform: translateY(-50%);
-  color: #feb32b;
 }
 
 @include up(1190) {
   .home-push {
     display: grid;
-    align-items: center;
+    align-items: flex-start;
     grid-template-columns: 1fr 800px;
-    grid-gap: space(9);
+    grid-gap: space(6);
   }
   .home-push__body {
-    margin-bottom: 120px;
+    margin-top: 24px;
+    margin-right: -200px;
   }
   .home-push__mosaic {
     max-width: 790px;
     grid-template-columns: repeat(40, 1fr);
     grid-auto-flow: dense;
     align-items: flex-end;
+    grid-gap: 20px;
+    margin-left: -50px;
 
     & > *:first-child {
       grid-column: 16 / span 22;
@@ -232,6 +249,22 @@
       grid-column-end: span 13;
       align-self: flex-start;
     }
+  }
+  .home-push__mosaic > *:nth-child(2) .pill,
+  .home-push__mosaic > *:nth-child(3) .pill {
+    position: absolute;
+    left: auto;
+    right: space(3);
+    top: auto;
+    bottom: 0;
+    transform: translateY(50%);
+  }
+}
+
+@include up(1400) {
+  .home-push__body {
+    margin-top: 40px;
+    margin-right: 0;
   }
 }
 
@@ -333,6 +366,9 @@
   .home-post__image img {
     width: 100%;
     height: auto;
+  }
+  .home-push__mosaic > *:last-child {
+    width: 300px;
   }
 }
 

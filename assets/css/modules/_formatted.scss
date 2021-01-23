@@ -1,7 +1,23 @@
-.formatted {
+.formatted:not[style^="display"] {
+  display: block !important;
+}
 
+.formatted {
   strong {
     font-weight: bold;
+  }
+
+  blockquote {
+    border-left: 5px solid var(--border-light);
+    color: var(--color-light);
+    padding-left: 1rem;
+    margin-left: 1rem;
+    padding-bottom: .5rem;
+    padding-top: .5rem;
+
+    p:last-child {
+      margin-bottom: 0;
+    }
   }
 
   > *:last-child {
@@ -30,8 +46,8 @@
     border: 1px solid var(--border-light);
 
     @include up(1400) {
-      margin-left: -2rem;
-      margin-right: -2rem;
+      margin-left: -1rem;
+      margin-right: -1rem;
     }
   }
 
@@ -64,7 +80,7 @@
 
   h2 {
     @extend %h2;
-    padding-top: 31px;
+    margin-top: space(5);
     margin-bottom: 2px;
   }
 

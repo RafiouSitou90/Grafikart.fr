@@ -9,6 +9,7 @@ use Twig\TwigFunction;
 class TwigLiveExtension extends AbstractExtension
 {
     private LiveService $liveService;
+    private ?\DateTimeImmutable $liveAt = null;
 
     public function __construct(LiveService $liveService)
     {
@@ -20,7 +21,7 @@ class TwigLiveExtension extends AbstractExtension
         return [
             new TwigFunction(
                 'is_live_running',
-                [$this, 'isLiveRuning'],
+                [$this->liveService, 'isLiveRunning'],
             ),
             new TwigFunction(
                 'next_live_time',
@@ -30,35 +31,27 @@ class TwigLiveExtension extends AbstractExtension
         ];
     }
 
-    public function isLiveRuning(): bool
-    {
-        return false;
-        // $live = $this->liveService->getCurrentLive();
-
-        // return $live && $live->getCreatedAt() < new \DateTime();
-    }
-
     public function getNextLiveTime(): string
     {
-        return '';
-        /*
-        $live = $this->liveService->getCurrentLive();
-        if (null === $live) {
+        $liveDate = $this->liveService->getNextLiveDate();
+        // Le live est passé
+        if ($liveDate->modify('+2 hour') < new \DateTime()) {
             return '';
         }
-        if ($live->getCreatedAt() < new \DateTime()) {
+        // Le live est en cours
+        if ($liveDate < new \DateTime()) {
             return "<small class='text-muted'>(En cours)</small>";
         }
-        $diff = $live->getCreatedAt()->diff(new \DateTime());
-        if ((int) $diff->format('%d') > 0) {
-            return "<small class='text-muted'>(J-{$diff->d})</small>";
+        // Le live est dans le futur
+        $diff =  $liveDate->getTimestamp() - time();
+        if ($diff > 24 * 3600) {
+            $days = ceil($diff / 24 * 3600);
+            return "<small class='text-muted'>(J-{$days})</small>";
         } else {
-            if ((int) $diff->format('%h') > 0) {
-                return "<small class='text-muted'>(H-{$diff->h})</small>";
-            }
+            $date = $liveDate->format('H:i');
+            return "<small class='text-muted'>({$date})</small>";
         }
 
         return "<small class='text-muted'>(bientôt)</small>";
-        */
     }
 }

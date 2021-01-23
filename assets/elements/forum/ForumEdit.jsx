@@ -7,6 +7,7 @@ import { Flex, Stack } from '/components/Layout.jsx'
 import { resolveEndpoint } from '/api/forum.js'
 import { jsonFetch } from '/functions/api.js'
 import { SecondaryButton } from '/components/Button.jsx'
+import { bindHighlight } from '/modules/highlight.js'
 
 export function ForumEdit ({ message, topic, owner }) {
   const element = useRef()
@@ -41,7 +42,9 @@ export function ForumEdit ({ message, topic, owner }) {
     // On met à jour le contenu dans la div
     const message = element.current.closest('.forum-message')
     setRawContent(data.content)
-    message.querySelector('.js-content').innerHTML = data.formattedContent
+    const messageContent = message.querySelector('.js-content')
+    messageContent.innerHTML = data.formattedContent
+    bindHighlight(messageContent)
     // On revient sur l'affichage du message
     handleCancel()
   }
@@ -72,6 +75,7 @@ export function ForumEdit ({ message, topic, owner }) {
       )}
       {state === 'edit' && (
         <ForumEditor
+          id={message}
           container={container.current}
           endpoint={endpoint}
           content={rawContent}
@@ -86,11 +90,11 @@ export function ForumEdit ({ message, topic, owner }) {
 /**
  * Génère un éditeur pour l'édition d'un message sur le forum
  */
-function ForumEditor ({ container, endpoint, onCancel, content, onSuccess }) {
+function ForumEditor ({ id, container, endpoint, onCancel, content, onSuccess }) {
   return createPortal(
     <FetchForm action={endpoint} method='PUT' onSuccess={onSuccess}>
       <Stack>
-        <FormField name='content' defaultValue={content} type='editor' />
+        <FormField id={`content${id}`} name='content' defaultValue={content} type='editor' autofocus={true} />
         <Flex>
           <FormPrimaryButton>Editer</FormPrimaryButton>
           <SecondaryButton onClick={onCancel} type='button'>

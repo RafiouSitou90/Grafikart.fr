@@ -62,9 +62,14 @@ trait ChapterableTrait
     /**
      * Extrait le premier contenu du premier chapitre.
      */
-    public function getFirstContent(): Content
+    public function getFirstContent(): ?Content
     {
-        return $this->getChapters()[0]->getModules()[0];
+        $firstChapter = $this->getChapters()[0] ?? null;
+        if (null === $firstChapter) {
+            return null;
+        }
+
+        return $firstChapter->getModules()[0] ?? null;
     }
 
     /**

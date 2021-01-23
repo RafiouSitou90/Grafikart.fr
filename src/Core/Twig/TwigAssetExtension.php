@@ -3,6 +3,7 @@
 namespace App\Core\Twig;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -18,6 +19,7 @@ class TwigAssetExtension extends AbstractExtension
     private RequestStack $requestStack;
     private bool $isProduction;
     private ?array $paths = null;
+    private bool $polyfillLoaded = false;
 
     public function __construct(
         string $assetPath,
@@ -76,7 +78,7 @@ class TwigAssetExtension extends AbstractExtension
             return $request ? "http://{$request->getHost()}:3000/{$name}" : '';
         }
 
-        $name = $this->getAssetPaths()[$name] ?? '';
+        $name = $this->getAssetPaths()[$name]['file'] ?? '';
 
         return "/assets/$name";
     }
@@ -94,15 +96,15 @@ class TwigAssetExtension extends AbstractExtension
     public function script(string $name): string
     {
         $script = '<script src="'.$this->uri($name.'.js').'" type="module" defer></script>';
+        $request = $this->requestStack->getCurrentRequest();
 
-        // Si on est en mode développement on injecte le système de Hot Reload de vite
-        if (!$this->isProduction) {
-            $request = $this->requestStack->getCurrentRequest();
-            if ($request) {
+        if (false === $this->polyfillLoaded && $request instanceof Request) {
+            $userAgent = $request->headers->get('User-Agent') ?: '';
+            if (strpos($userAgent, 'Safari') &&
+                !strpos($userAgent, 'Chrome')) {
+                $this->polyfillLoaded = true;
                 $script = <<<HTML
-                    <script type="module">
-                    import "//{$request->getHost()}:3000/vite/client"
-                    </script>
+                    <script src="//unpkg.com/@ungap/custom-elements" defer></script>
                     $script
                 HTML;
             }

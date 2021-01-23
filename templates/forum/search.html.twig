@@ -38,10 +38,17 @@
           </div>
           <a href="{{ path(topic) }}" aria-hidden="true" class="forum-topic__link" tabindex="-1"></a>
         </div>
+      {% else %}
+        <div class="py5">
+          <div class="h2 center">Aucun résultat :(</div>
+          <p class="text-muted center mt1">
+            Il ne semble pas avoir de sujet correspondant à votre recherche.
+          </p>
+        </div>
       {% endfor %}
     </div>
 
-    {{ paginate(topics) }}
+    {{ topics is not empty ? paginate(topics) : '' }}
 
   </div>
 

@@ -27,6 +27,8 @@ class Transaction
     private int $duration;
 
     /**
+     * Prix de l'achat (TVA incluse).
+     *
      * @ORM\Column(type="float")
      */
     private float $price;
@@ -119,11 +121,6 @@ class Transaction
         $this->duration = $duration;
 
         return $this;
-    }
-
-    public function getTotal(): float
-    {
-        return $this->price + $this->tax;
     }
 
     public function getPrice(): float

@@ -2,10 +2,10 @@
 
 {% set bodyClass = 'light' %}
 
-{% block title 'Grafikart | Tutoriels et Formations vidéos sur le développement web' %}
+{% block title 'Tutoriels et Formations vidéos sur le développement web' %}
 
 {% block body %}
-  {% cache [courses, app.user ? 'authenticated' : 'anonymous', 'home'] %}
+  {% cache [courses, app.user ? 'authenticated' : 'anonymous'] %}
     <main class="homepage">
 
       <section class="container">
@@ -65,17 +65,21 @@
       {% if courses | length > 0 %}
           <section class="home-push container">
             <div class="home-push__body stack">
-              <h2 class="hero-title">Apprendre grâce à plusieurs formats</h2>
-              <p class="hero-text">Les cursus sont une série de vidéo sélectionnées manuellement pour vous faire atteindre un
-                objectif spécifique</p>
+              <h2 class="hero-title">Apprendre grâce à <strong>plusieurs formats</strong></h2>
+              <p class="hero-text">
+                Vous cherchez une formation complète pour apprendre de A à Z ou une vidéo pour découvrir
+                un nouvel outil ? Vous devriez trouver votre bonheur
+              </p>
+              {#
               <div>
                 <a class="btn-primary-outlined btn-big" href="{{ path('course_index') }}">Découvrir les derniers tutoriels</a>
               </div>
+              #}
             </div>
             <div class="home-push__mosaic">
 
               <div class="card card-big">
-                <a class="badge-rounded" href="{{ path('formation_index') }}">Les dernières formations</a>
+                <a class="pill pill-yellow" href="{{ path('formation_index') }}">Les dernières formations</a>
                 <div class="home-list stack-separated">
                   {% for formation in formations %}
                     <div class="home-list__item has-icon">
@@ -93,7 +97,7 @@
               </div>
 
               <div class="card card-big">
-                <a class="badge-rounded" href="{{ path('course_index') }}">Les derniers tutoriels</a>
+                <a class="pill" href="{{ path('course_index') }}">Les derniers tutoriels</a>
                 <div class="home-list stack-separated">
                   {% for course in courses %}
                     <div class="home-list__item has-icon">
@@ -111,11 +115,12 @@
               </div>
 
               <div class="card card-big">
+                <a class="pill pill-green" href="{{ path('live') }}">Tous les lives</a>
                 <div class="home-list stack-separated" style="--gap: 2">
                   {% for live in lives %}
                     <div class="home-list__item">
                       <a class="card__title" href="https://www.youtube.com/watch?v={{ live.youtubeId }}">{{ live.name }}</a>
-                      <div>{{ live.createdAt | date("m F Y") }}</div>
+                      <div>{{ live.createdAt | format_date('long') }}</div>
                     </div>
                   {% endfor %}
                 </div>
@@ -143,7 +148,7 @@
               <div class="home-blog__body stack">
                 <h1 class="hero-title">Des nouvelles du blog</h1>
                 <div class="hero-text formatted">
-                  Améliorez-vous et apprenez de nouvelles choses grâce à 513 heures de tutoriels vidéos gratuits.
+                  Venez découvrir les actualités autour de l'univers du développement web.
                 </div>
                 <div class="mt1 mb3">
                   <a class="btn-primary-outlined btn-big" href="{{ path('blog_index') }}">Accéder au blog</a>

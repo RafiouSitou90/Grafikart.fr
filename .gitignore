@@ -1,6 +1,8 @@
+/public/report.html
 /downloads/*
 /public/assets
 /public/icons
+/public/demo
 /public/old
 /public/uploads
 *.sql

@@ -1,6 +1,6 @@
 {% set plans = repository('App\\Domain\\Premium\\Entity\\Plan', 'findAll') %}
 
-<nav-tabs class="tabs-toggle" style="margin-bottom: 50px;">
+<nav-tabs class="tabs-toggle" style="margin-bottom: 35px;">
   {% for plan in plans %}
     <button aria-controls="plan{{ plan.id }}">{{ plan.name }}</button>
   {% endfor %}
@@ -10,10 +10,6 @@
   <div class="card pricing" id="plan{{ plan.id }}">
     <div class="pricing__price">{{ plan.price }}<sup>€ TTC</sup></div>
     {# <div class="pricing__eco">(économiser 10%)</div> #}
-    <div class="pricing__item">
-      Visionner les tutoriels
-      <strong>en avance</strong>
-    </div>
     <div class="pricing__item">
       Visionner les tutoriels
       <strong>en avance</strong>
@@ -32,7 +28,7 @@
     </div>
     <div class="pricing__action">
       <premium-button plan="{{ plan.id }}" price="{{ plan.price }}" duration="{{ plan.duration }}" stripe-key="{{ stripeKey() }}" paypal-id="{{ paypalClientId() }}">
-        Devenir premium ({{ plan.duration }} mois)
+        Devenir premium ({{ plan.name }})
       </premium-button>
     </div>
   </div>

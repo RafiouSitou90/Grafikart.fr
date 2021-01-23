@@ -111,3 +111,6 @@ volumes:
     driver: local
   search-data:
     driver: local
+
+networks:
+  dev:

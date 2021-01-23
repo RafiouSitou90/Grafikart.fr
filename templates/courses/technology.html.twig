@@ -9,7 +9,7 @@
   <header class="page-header technology-header container">
     <div class="stack w100">
       <h1 class="h1">{{ technology.name }}</h1>
-      <div class="formatted">{{ technology.content | markdown }}</div>
+      <div class="formatted text-big">{{ technology.content | markdown }}</div>
     </div>
     <div class="technology-header__logo">
       <img src="{{ uploads_path('icons/' ~ technology.image) }}" alt="{{ technology.name }}">
@@ -84,10 +84,11 @@
 
     {# Sideabr #}
     <div class="stack" style="--gap: 5">
+      {% if technology.requirements is not empty %}
       <section class="stack">
-        <div class="h3"><strong>Ce qu'il faut connaitre</strong></div>
+        <div class="h3"><strong>Ce qu'il faut connaître</strong></div>
         <p>
-          Avant de pouvoir apprendre PHP il est important d'avoir acquis les connaissances suivantes.
+          Avant de pouvoir apprendre {{ technology.name }}, il est important d'avoir acquis les connaissances suivantes :
         </p>
         <div class="list-group">
           {% for technology in technology.requirements %}
@@ -95,6 +96,7 @@
           {% endfor %}
         </div>
       </section>
+      {% endif %}
       {% if next is not empty %}
       <section class="stack">
         <div class="h3"><strong>Que faire après ?</strong></div>
@@ -102,8 +104,8 @@
           <div class="mb2">
             <div class="h4 mb1">{{ category }}</div>
             <div class="list-group">
-              {% for technology in technologies %}
-                <a href="{{ path(technology) }}">{{ technology.name }}</a>
+              {% for t in technologies %}
+                <a href="{{ path(t) }}">{{ t.name }}</a>
               {% endfor %}
             </div>
           </div>

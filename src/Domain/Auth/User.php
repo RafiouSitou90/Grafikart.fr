@@ -20,8 +20,8 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  * @ORM\Entity(repositoryClass="App\Domain\Auth\UserRepository")
  * @ORM\Table(name="`user`")
  * @Vich\Uploadable()
- * @UniqueEntity(fields={"email"})
- * @UniqueEntity(fields={"username"})
+ * @UniqueEntity(fields={"email"}, repositoryMethod="findByCaseInsensitive")
+ * @UniqueEntity(fields={"username"}, repositoryMethod="findByCaseInsensitive")
  */
 class User implements UserInterface, \Serializable, ForumReaderUserInterface, CacheableInterface
 {
@@ -48,6 +48,7 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
+     * @Assert\Length(min=5, max=100)
      * @Assert\Email()
      */
     private string $email = '';
@@ -117,6 +118,11 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
      */
     private bool $forumMailNotification = true;
 
+    /**
+     * @ORM\Column(type="string", options={"default": null}, nullable=true)
+     */
+    private ?string $lastLoginIp = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,9 +140,9 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
         return $this->username;
     }
 
-    public function setUsername(string $username): self
+    public function setUsername(?string $username): self
     {
-        $this->username = $username;
+        $this->username = trim($username ?: '');
 
         return $this;
     }
@@ -146,9 +152,9 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail(?string $email): self
     {
-        $this->email = $email;
+        $this->email = $email ?: '';
 
         return $this;
     }
@@ -158,9 +164,9 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword(?string $password): self
     {
-        $this->password = $password;
+        $this->password = $password ?: '';
 
         return $this;
     }
@@ -261,9 +267,9 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
         ] = unserialize($serialized);
     }
 
-    public function getCountry(): ?string
+    public function getCountry(): string
     {
-        return $this->country;
+        return $this->country ?: 'FR';
     }
 
     public function setCountry(?string $country): User
@@ -324,9 +330,9 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
         return $this->goal;
     }
 
-    public function setGoal(string $goal): User
+    public function setGoal(?string $goal): User
     {
-        $this->goal = $goal;
+        $this->goal = $goal ?: '';
 
         return $this;
     }
@@ -352,6 +358,17 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
     {
         $this->theme = $theme;
 
+        return $this;
+    }
+
+    public function getLastLoginIp(): ?string
+    {
+        return $this->lastLoginIp;
+    }
+
+    public function setLastLoginIp(?string $lastLoginIp): User
+    {
+        $this->lastLoginIp = $lastLoginIp;
         return $this;
     }
 }

@@ -47,4 +47,12 @@ class NginxAuthController extends AbstractController
 
         return new Response(null, Response::HTTP_FORBIDDEN);
     }
+
+    /**
+     * @Route("/goaccessws", name="report_ws")
+     */
+    public function goaccess(): Response
+    {
+        return $this->report();
+    }
 }

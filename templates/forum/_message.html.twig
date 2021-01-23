@@ -7,7 +7,7 @@
       <div class="forum-message__author">
         {{ message.author.username }}
         {% if message.accepted %}
-          <div class="ml1 forum-message__accepted badge badge-success">
+          <div class="ml1 forum-message__accepted pill pill-green small">
             Réponse acceptée
           </div>
         {% endif %}
@@ -30,7 +30,7 @@
     </div>
   </div>
   <div class="forum-message__body">
-    <div class="js-content formatted card" style="padding:1rem;">
+    <div class="formatted card js-content p2">
       {{ message.content | markdown_untrusted }}
     </div>
     <div class="js-forum-edit"></div>

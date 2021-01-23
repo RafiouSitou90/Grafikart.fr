@@ -24,13 +24,17 @@
   padding-bottom: 70px;
   margin-bottom: -70px;
   --wave-height: 50px;
+
+  & > * {
+    min-width: 0;
+  }
 }
 .wave-header__body {
   @extend %hero-text;
   padding-bottom: 20px;
 }
 .wave-header__title {
-  @extend %hero-title;
+  @extend %h1;
 }
 .wave-header__image {
   display: none;

@@ -44,6 +44,19 @@ input:disabled {
   display: block;
   margin-bottom: space(1);
 }
+.form-group select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%23121c4299' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>");
+  background-size: 12px 12px;
+  background-position: center right 20px;
+  background-repeat: no-repeat;
+
+  @include dark {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path fill='none' stroke='%238491c7' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/></svg>");
+  }
+}
 
 // Checkbox
 // ==================
@@ -272,6 +285,11 @@ button:not([class]):hover .icon-delete {
     border-radius: 50%;
     transform: translate(-50%, -50%);
     transition: background-color .3s;
+    pointer-events: none;
+  }
+
+  & + label {
+    cursor: pointer;
   }
 
   &.is-checked {
@@ -284,11 +302,15 @@ button:not([class]):hover .icon-delete {
 
   input {
     opacity: 0;
+    cursor: pointer;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
   }
 }
 

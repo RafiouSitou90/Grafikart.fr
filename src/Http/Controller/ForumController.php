@@ -38,20 +38,21 @@ class ForumController extends AbstractController
     /**
      * @Route("/forum", name="forum")
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return $this->tag(null);
+        return $this->tag(null, $request);
     }
 
     /**
      * @Route("/forum/{slug<[a-z0-9\-]+>}-{id<\d+>}", name="forum_tag")
      */
-    public function tag(?Tag $tag): Response
+    public function tag(?Tag $tag, Request $request): Response
     {
         $topics = $this->paginator->paginate($this->topicRepository->queryAllForTag($tag));
 
         return $this->render('forum/index.html.twig', [
             'tags' => $this->tagRepository->findTree(),
+            'page' => $request->query->getInt('page', 1),
             'topics' => $topics,
             'menu' => 'forum',
             'current_tag' => $tag,
@@ -73,6 +74,14 @@ class ForumController extends AbstractController
             'topic' => $topic,
             'menu' => 'forum',
         ]);
+    }
+
+    /**
+     * @Route("/forum/topics/{id<\d+>}", name="forum_show_legacy")
+     */
+    public function showLegacy(int $id): Response
+    {
+        return $this->redirectToRoute('forum_show', ['id' => $id], 301);
     }
 
     /**
@@ -129,12 +138,16 @@ class ForumController extends AbstractController
         \Knp\Component\Pager\PaginatorInterface $paginator
     ): Response {
         $q = $request->get('q');
-        $page = $request->get('page', 1);
-        [$items, $total] = $topicRepository->search($q, $page);
-        $topics = $paginator->paginate([], 1, 10, ['whiteList' => []]);
-        $topics->setTotalItemCount($total);
-        $topics->setItems($items);
-        $topics->setCurrentPageNumber($page);
+        if (empty($q)) {
+            $topics = [];
+        } else {
+            $page = $request->get('page', 1);
+            [$items, $total] = $topicRepository->search($q, $page);
+            $topics = $paginator->paginate([], 1, 10, ['whiteList' => []]);
+            $topics->setTotalItemCount($total);
+            $topics->setItems($items);
+            $topics->setCurrentPageNumber($page);
+        }
 
         return $this->render('forum/search.html.twig', [
             'q' => $q,

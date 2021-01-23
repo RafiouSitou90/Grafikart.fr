@@ -1,8 +1,9 @@
-import { ApiError, HTTP_UNPROCESSABLE_ENTITY, jsonFetch } from '/functions/api.js'
+import { ApiError, HTTP_FORBIDDEN, HTTP_UNPROCESSABLE_ENTITY, jsonFetch } from '/functions/api.js'
 import { strToDom } from '/functions/dom.js'
 import { isAuthenticated } from '/functions/auth.js'
 import { onNotification } from '/api/notifications.js'
 import { isActiveWindow } from '/functions/window.js'
+import { flash } from '/elements/Alert.js'
 
 const konamicode = [
   'ArrowUp',
@@ -34,6 +35,11 @@ export function registerKonami () {
     }
     if (keys.toString().indexOf(konamicode) >= 0) {
       await jsonFetch('/api/badges/gamer/unlock', { method: 'POST' })
+        .catch(e => {
+          if (e instanceof ApiError && e.status === HTTP_UNPROCESSABLE_ENTITY) {
+            flash('Vous avez déjà débloqué ce badge', 'error')
+          }
+        })
     }
   })
 
@@ -70,17 +76,20 @@ window.nessie = () => {
   }
   jsonFetch('/api/badges/lochness/unlock', { method: 'POST' })
     .then(() => {
-      console.log(`%c                        _   _       _a_a
-            _   _     _{.\`=\`.}_    {/ ''\\_
-      _    {.\`'\`.}   {.'  _  '.}  {|  ._oo)
-     { \\  {/ .-. \\} {/  .' '.  \\} {/  |
-~^~^~\`~^~\`~^~\`~^~\`~^~^~\`^~^~\`^~^~^~^~^~^~\`^~~\``, `color: #FFF; background-color: #2234ae;
+      console.log(
+"%c                        _   _       _a_a      \n" +
+"            _   _     _{.`=`.}_    {/ ''\\_    \n" +
+"      _    {.`'`.}   {.'  _  '.}  {|  ._oo)   \n" +
+"     { \\  {/ .-. \\} {/  .' '.  \\} {/  |       \n" +
+"~^~^~`~^~`~^~`~^~`~^~^~`^~^~`^~^~^~^~^~^~`^~~`", `color: #FFF; background-color: #2234ae;
 background-image: linear-gradient(315deg, #2234ae 0%, #191714 74%);`)
     })
     .catch((e) => {
       if (e instanceof ApiError) {
         if (e.status === HTTP_UNPROCESSABLE_ENTITY) {
           console.warn('Vous avez déjà trouvé Nessie :(')
+        } else if (e.status === HTTP_FORBIDDEN) {
+          console.warn("Vous n'avez pas l'autorisation de débloquer ce badge :(")
         }
       }
     })

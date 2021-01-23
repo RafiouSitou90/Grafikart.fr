@@ -13,6 +13,10 @@
   display: grid;
   grid-gap: space(2);
 
+  .hero-title {
+    flex: none;
+  }
+
   @include up(800) {
     display: flex;
     align-items: center;
@@ -27,6 +31,13 @@
 .forum-page__sidebar {
   @include down(800) {
     grid-row-start: 2;
+  }
+}
+
+.forum-page__sidebar-btn {
+  .icon {
+    margin-right: 0;
+    margin-left: auto;
   }
 }
 
@@ -74,7 +85,7 @@
 
 .is-solved .forum-avatar::after {
   opacity: 1;
-  background: url(..//images/check.svg) center center / 50% 50% no-repeat;
+  background: url(../images/check.svg) center center / 50% 50% no-repeat;
 }
 
 // Réponse acceptée
@@ -91,7 +102,7 @@
   height: 18px;
   border-radius: 15px;
   border: 2px solid var(--background);
-  background: url(..//images/check.svg) center center / 70% 70% no-repeat var(--green);
+  background: url(../images/check.svg) center center / 70% 70% no-repeat var(--green);
 }
 
 // Listing sujet
@@ -127,8 +138,11 @@
 }
 
 .forum-topic.is-read {
-  filter: grayscale(1);
   opacity: .6;
+
+  img {
+    filter: grayscale(1);
+  }
 
   .forum-topic__title {
     color: var(--color-light);
@@ -141,6 +155,10 @@
   font-weight: bold;
   font-family: $font-alt;
   line-height: 1.3;
+
+  @include down(800) {
+    margin-right: 0;
+  }
 
   .forum-topic:hover & {
     color: var(--contrast);
@@ -178,13 +196,16 @@
   }
 }
 
-.forum-topic__tags a[style] {
-  color: #fff;
+.forum-topic__tags a {
+  border-radius: 2px;
+  padding: space(1);
 }
 
-.forum-topic__tags a {
-  background-color: var(--border-light);
-  border-radius: 2px;
+.forum-topic__tags a[style] {
+  color: #fff;
+  &::after {
+    display: none; // overwrite pill overlay
+  }
 }
 
 .forum-topic__meta {
@@ -277,6 +298,10 @@
   }
 }
 
+.forum-message__body .card {
+  display: block;
+}
+
 .forum-message.is-reply {
   display: grid;
   grid-template-columns: 50px 1fr;
@@ -288,6 +313,11 @@
 
   .forum-message__body {
     grid-column: 2 / -1;
+
+    pre.with-syntax {
+      margin-left: space(-2);
+      margin-right: space(-2);
+    }
   }
 
   .hjs {
@@ -314,8 +344,15 @@
   padding: 5px space(1);
 
   img {
-    margin-right: space(1);
     transform: translateY(-1px);
+  }
+
+  span {
+    width: 12px;
+    height: 12px;
+    display: block;
+    border-radius: 50%;
+    margin-right: space(1);
   }
 
   &:hover {
