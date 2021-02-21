@@ -7,6 +7,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Domain\Comment\Comment;
 use App\Domain\Comment\CommentData;
+use App\Validator\NotExists;
 use Parsedown;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -43,6 +44,7 @@ class CommentResource extends CommentData
     /**
      * @Groups({"read", "write"})
      * @Assert\NotBlank(groups={"anonymous"}, normalizer="trim")
+     * @NotExists(groups={"anonymous"}, field="username", class="App\Domain\Auth\User", message="Ce pseudo est utilisé par un utilisateur")
      */
     public ?string $username = null;
 
@@ -67,13 +69,6 @@ class CommentResource extends CommentData
      * @Groups({"write"})
      */
     public ?int $target = null;
-
-    /**
-     * @Assert\NotBlank(groups={"anonymous"})
-     * @Groups({"write"})
-     * @Assert\Email(groups={"anonymous"})
-     */
-    public ?string $email = null;
 
     /**
      * @Groups({"read"})
@@ -114,8 +109,7 @@ class CommentResource extends CommentData
         if ($author && $uploaderHelper && $author->getAvatarName()) {
             $resource->avatar = $uploaderHelper->asset($author, 'avatarFile');
         } else {
-            $gravatar = md5($comment->getEmail());
-            $resource->avatar = "https://1.gravatar.com/avatar/{$gravatar}?s=200&r=pg&d=mp";
+            $resource->avatar = '/images/default.png';
         }
         $resource->entity = $comment;
         $resource->userId = $author ? $author->getId() : null;

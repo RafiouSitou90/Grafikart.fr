@@ -1,6 +1,6 @@
 isDocker := $(shell docker info > /dev/null 2>&1 && echo 1)
 domain := "grafikart.fr"
-server := "grafikart@$(domain)"
+server := "grafikart"
 user := $(shell id -u)
 group := $(shell id -g)
 
@@ -58,13 +58,12 @@ dump: var/dump ## Génère un dump SQL
 	$(de) db sh -c 'PGPASSWORD="grafikart" pg_dump grafikart -U grafikart > /var/www/var/dump/dump.sql'
 
 .PHONY: dumpimport
-dumpimport: var/dump ## Import un dump SQL
-	$(de) db sh -c 'psql grafikart < /var/www/var/dump/dump.sql'
+dumpimport: ## Import un dump SQL
+	$(de) db sh -c 'pg_restore -c -d grafikart -U grafikart /var/www/var/dump'
 
 .PHONY: seed
 seed: vendor/autoload.php ## Génère des données dans la base de données (docker-compose up doit être lancé)
 	$(sy) doctrine:migrations:migrate -q
-	$(sy) doctrine:schema:validate -q
 	$(sy) app:seed -q
 
 .PHONY: migration
@@ -92,13 +91,14 @@ tt: vendor/autoload.php ## Lance le watcher phpunit
 
 .PHONY: lint
 lint: vendor/autoload.php ## Analyse le code
-	docker run -v $(PWD):/app -w /app --rm php:7.4-cli-alpine php -d memory_limit=-1 ./vendor/bin/phpstan analyse
+	docker run -v $(PWD):/app -w /app -t --rm php:7.4-cli-alpine php -d memory_limit=-1 bin/console lint:container
+	docker run -v $(PWD):/app -w /app -t --rm php:7.4-cli-alpine php -d memory_limit=-1 ./vendor/bin/phpstan analyse
 
 .PHONY: format
 format: ## Formate le code
 	npx prettier-standard --lint --changed "assets/**/*.{js,css,jsx}"
-	./vendor/bin/phpcbf
-	./vendor/bin/php-cs-fixer fix
+	docker run -v $(PWD):/app -w /app -t --rm php:7.4-cli-alpine php -d memory_limit=-1 ./vendor/bin/phpcbf
+	docker run -v $(PWD):/app -w /app -t --rm php:7.4-cli-alpine php -d memory_limit=-1 ./vendor/bin/php-cs-fixer fix
 
 .PHONY: doc
 doc: ## Génère le sommaire de la documentation
@@ -110,31 +110,6 @@ doc: ## Génère le sommaire de la documentation
 .PHONY: provision
 provision: ## Configure la machine distante
 	ansible-playbook --vault-password-file .vault_pass -i tools/ansible/hosts.yml tools/ansible/install.yml
-
-.PHONY: import
-import: vendor/autoload.php ## Importe les données du site actuel et génère un dump en sortie
-	gunzip -k downloads/grafikart.gz
-	$(dcimport) down
-	$(dcimport) up -d
-	@echo "Attendre que la base soit initialisée 'docker-compose -f docker-compose.import.yml logs -f mariadb'?: "; read ok;
-	rsync -avz --ignore-existing --progress --exclude=avatars --exclude=tmp --exclude=users old.grafikart:/home/www/grafikart.fr/shared/public/uploads/ ./public/old/
-	$(dcimport) exec db /docker-entrypoint.sh
-	tar -xf downloads/grafikart.tar.gz -C downloads/
-	$(sy) doctrine:migrations:migrate -q
-	$(sy) app:import reset
-	$(sy) app:import users
-	$(sy) app:import tutoriels
-	$(sy) app:import formations
-	$(sy) app:import blog
-	$(sy) app:import comments
-	$(sy) app:import forum
-	$(sy) app:import badges
-	$(sy) app:import transactions
-	$(dcimport) exec db sh -c 'PGPASSWORD="grafikart" pg_dump -U grafikart -Ft grafikart --clean > /var/www/var/dump.tar'
-	$(dcimport) down
-	ansible-playbook -i tools/ansible/hosts.yml tools/ansible/import.yml
-	rm -rf var/dump.tar
-	rsync -avz --ignore-existing --progress ./public/uploads/ $(server):~/$(domain)/public/uploads/
 
 # -----------------------------------
 # Dépendances

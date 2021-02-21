@@ -2,8 +2,8 @@
 
 namespace App\Domain\Forum\Entity;
 
-use App\Core\Twig\CacheExtension\CacheableInterface;
 use App\Domain\Auth\User;
+use App\Http\Twig\CacheExtension\CacheableInterface;
 use App\Infrastructure\Spam\SpammableInterface;
 use App\Infrastructure\Spam\SpamTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Message implements SpammableInterface, CacheableInterface
 {
+    use SpamTrait;
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -38,14 +39,14 @@ class Message implements SpammableInterface, CacheableInterface
     private User $author;
 
     /**
-     * @ORM\Column(type="boolean", options={"default":0})
+     * @ORM\Column(type="boolean", options={"default": false})
      */
     private bool $accepted = false;
 
     /**
      * @ORM\Column(type="text")
-     * @Assert\NotBlank(groups={"create"})
-     * @Assert\Length(min=10, groups={"create"})
+     * @Assert\NotBlank()
+     * @Assert\Length(min=10)
      * @Groups({"read:message", "update:message"})
      */
     private ?string $content = null;
@@ -59,8 +60,6 @@ class Message implements SpammableInterface, CacheableInterface
      * @ORM\Column(type="datetime")
      */
     private ?\DateTimeInterface $updatedAt = null;
-
-    use SpamTrait;
 
     public function getId(): ?int
     {
@@ -123,7 +122,7 @@ class Message implements SpammableInterface, CacheableInterface
     }
 
     /**
-     * @Groups({"updated:message"})
+     * @Groups({"read:message"})
      */
     public function getFormattedContent(): ?string
     {

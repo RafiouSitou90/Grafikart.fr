@@ -2,8 +2,8 @@
 
 namespace App\Domain\Comment;
 
-use App\Core\Orm\AbstractRepository;
 use App\Domain\Auth\User;
+use App\Infrastructure\Orm\AbstractRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -58,9 +58,9 @@ class CommentRepository extends AbstractRepository
         return $this->createQueryBuilder('c')
             ->orderBy('c.createdAt', 'DESC')
             ->join('c.target', 't')
-            ->join('c.author', 'a')
+            ->leftJoin('c.author', 'a')
             ->addSelect('t', 'a')
-            ->setMaxResults(5)
+            ->setMaxResults(7)
             ->getQuery();
     }
 

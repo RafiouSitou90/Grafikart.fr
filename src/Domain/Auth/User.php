@@ -2,11 +2,11 @@
 
 namespace App\Domain\Auth;
 
-use App\Core\Twig\CacheExtension\CacheableInterface;
 use App\Domain\Forum\Entity\ForumReaderUserInterface;
 use App\Domain\Notification\Entity\Notifiable;
 use App\Domain\Premium\Entity\PremiumTrait;
 use App\Domain\Profile\Entity\DeletableTrait;
+use App\Http\Twig\CacheExtension\CacheableInterface;
 use App\Infrastructure\Payment\Stripe\StripeEntity;
 use App\Infrastructure\Social\Entity\SocialLoggableTrait;
 use Doctrine\ORM\Mapping as ORM;
@@ -122,6 +122,11 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
      * @ORM\Column(type="string", options={"default": null}, nullable=true)
      */
     private ?string $lastLoginIp = null;
+
+    /**
+     * @ORM\Column(type="datetime", options={"default": null}, nullable=true)
+     */
+    private ?\DateTimeInterface $lastLoginAt = null;
 
     public function getId(): ?int
     {
@@ -369,6 +374,19 @@ class User implements UserInterface, \Serializable, ForumReaderUserInterface, Ca
     public function setLastLoginIp(?string $lastLoginIp): User
     {
         $this->lastLoginIp = $lastLoginIp;
+
+        return $this;
+    }
+
+    public function getLastLoginAt(): ?\DateTimeInterface
+    {
+        return $this->lastLoginAt;
+    }
+
+    public function setLastLoginAt(?\DateTimeInterface $lastLoginAt): User
+    {
+        $this->lastLoginAt = $lastLoginAt;
+
         return $this;
     }
 }

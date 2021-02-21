@@ -56,8 +56,7 @@
         {% for technology in formation.mainTechnologies %}
           {% if technology.slug == 'symfony' %}
           <alert-message type="info">
-            Cette formation n'est pas officiellement supportée par <a href="https://sensiolabs.com/" target="_blank">SensioLabs</a>.<br>
-            Si vous êtes intéréssé·e par des formations officielles, rendez vous sur <a href="https://training.sensiolabs.com/fr/" target="_blank">SensioLabs University
+            Cette formation n'est pas officiellement supportée par <a href="https://sensiolabs.com/" target="_blank">SensioLabs</a>.
           </alert-message>
           {% endif %}
         {% endfor %}
@@ -106,7 +105,7 @@
               <youtube-player
                 id="course-{{ first_course.id }}"
                 video="{{ first_course.youtubeId }}"
-                poster="{{ image_url(first_course.image) }}"
+                poster="{{ image_url(first_course.image, 1330, 750) }}"
                 duration="{{ first_course.duration | duration }}"
                 button="#chapter{{ first_course.id }} play-button"
                 class="shadow formation-intro"></youtube-player>

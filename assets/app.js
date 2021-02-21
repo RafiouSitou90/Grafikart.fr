@@ -11,11 +11,12 @@ import ChoicesJS from 'choices.js'
 import { $$, $ } from '/functions/dom.js'
 import { registerKonami, registerBadgeAlert } from '/modules/badges.js'
 import { registerWindowHeightCSS } from '/modules/window.js'
+import { registerHeader } from '/modules/header.js'
 import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-
 
 registerKonami()
 registerBadgeAlert()
+registerHeader()
 registerWindowHeightCSS()
 
 document.addEventListener('turbolinks:load', () => {
@@ -43,7 +44,7 @@ document.addEventListener('turbolinks:load', () => {
   }
 
   // Choices
-  $$('select[multiple]').forEach(
+  $$('select[multiple]:not([is])').forEach(
     s =>
       new ChoicesJS(s, {
         placeholder: true,
@@ -77,3 +78,5 @@ document.addEventListener('turbolinks:click', e => {
 window.Grafikart = {
   showHistory
 }
+
+Turbolinks.start()

@@ -8,6 +8,7 @@ parameters:
   twitter_secret:   '%env(resolve:TWITTER_SECRET)%'
   container.dumper.inline_factories: true
   container.dumper.inline_class_loader: true
+  dkim_key: '%env(resolve:default::MAILER_DKIM)%'
 
 services:
   _defaults:
@@ -17,9 +18,11 @@ services:
     bind:
       $videosPath: '%videos_path%'
       $projectDir: '%kernel.project_dir%'
+      $adminPrefix: '%admin_prefix%'
+      $appEnv: '%kernel.environment%'
 
   _instanceof:
-    App\Core\Breadcrumb\BreadcrumbGeneratorInterface:
+    App\Normalizer\Breadcrumb\BreadcrumbGeneratorInterface:
       tags: ['app.breadcrumb']
 
   Redis:
@@ -47,10 +50,6 @@ services:
     resource: '../src/Http/Api/Controller'
     tags: ['controller.service_arguments']
 
-  Everyman\Neo4j\Client:
-    factory: ['App\Core\Services\Neo4jClientFactory', 'createClient']
-    arguments: ['neo4j', 'neo4j', 'neo']
-
   App\Infrastructure\Storage\Naming\IdDirectoryNamer:
     public: true
 
@@ -59,20 +58,20 @@ services:
 
   Knp\Bundle\PaginatorBundle\Helper\Processor: ~
 
-  App\Core\Helper\Paginator\PaginatorInterface:
-    class: App\Core\Helper\Paginator\KnpPaginator
+  App\Helper\Paginator\PaginatorInterface:
+    class: App\Helper\Paginator\KnpPaginator
 
-  App\Core\Twig\TwigBreadcrumbExtension:
+  App\Http\Twig\TwigBreadcrumbExtension:
     arguments: [!tagged_iterator app.breadcrumb]
 
-  App\Core\UploaderBundle\PropertyGroupedDirectoryNamer:
+  App\Infrastructure\Uploader\PropertyGroupedDirectoryNamer:
     public: true
 
   App\Infrastructure\Mercure\Service\CookieGenerator:
     arguments:
       $secret: '%env(resolve:MERCURE_SUBSCRIBER_KEY)%'
 
-  App\Core\Twig\TwigAssetExtension:
+  App\Http\Twig\TwigAssetExtension:
     arguments:
       $assetPath: '%kernel.project_dir%/public/assets'
       $env: '%kernel.environment%'
@@ -80,10 +79,10 @@ services:
   App\Infrastructure\Image\ImageResizer:
     arguments: ['%image_resize_key%']
 
-  App\Core\Orm\DoctrineSchemaListener:
+  App\Infrastructure\Orm\DoctrineSchemaListener:
     tags: ['doctrine.event_subscriber']
 
-  App\Core\Services\TwitterService:
+  App\Infrastructure\Twitter\TwitterService:
     arguments: ['%twitter_key%', '%twitter_secret%']
 
   App\Infrastructure\Queue\FailedJobsService:
@@ -104,6 +103,11 @@ services:
   App\Infrastructure\Storage\DropboxFilesystemFactory:
     arguments:
       - '%env(DROPBOX_TOKEN)%'
+
+  App\Infrastructure\Mailing\Mailer:
+    class: App\Infrastructure\Mailing\Mailer
+    arguments:
+      $dkimKey: '%dkim_key%'
 
   dropbox_filesystem:
     class: League\Flysystem\Filesystem

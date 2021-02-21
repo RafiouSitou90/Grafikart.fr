@@ -2,12 +2,12 @@
 
 namespace App\Http\Controller\Course;
 
-use App\Core\Helper\Paginator\PaginatorInterface;
 use App\Domain\Course\Entity\Course;
 use const App\Domain\Course\Entity\EASY;
 use const App\Domain\Course\Entity\HARD;
 use App\Domain\Course\Repository\CourseRepository;
 use App\Domain\Course\Repository\TechnologyRepository;
+use App\Helper\Paginator\PaginatorInterface;
 use App\Http\Security\CourseVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -120,5 +120,15 @@ class CourseController extends AbstractController
         $this->denyAccessUnlessGranted(CourseVoter::DOWNLOAD_VIDEO, $course);
 
         return $this->redirectToRoute('stream_video', ['video' => $course->getVideoPath()]);
+    }
+
+    /**
+     * Redirection des anciennes URLs vers la nouvelle.
+     *
+     * @Route("/tutoriels/{technology<[a-z0-9A-Z\-]+>}/{slug<[a-z0-9A-Z\-]+>}-{id<\d+>}", name="legacy_course_show")
+     */
+    public function legacyShow(string $technology, string $slug, string $id): Response
+    {
+        return $this->redirectToRoute('course_show', ['slug' => $slug, 'id' => $id], Response::HTTP_MOVED_PERMANENTLY);
     }
 }

@@ -2,10 +2,10 @@
 
 namespace App\Tests\Domain\Password;
 
-use App\Core\Security\TokenGeneratorService;
 use App\Domain\Auth\UserRepository;
 use App\Domain\Password\Entity\PasswordResetToken;
 use App\Domain\Password\Repository\PasswordResetTokenRepository;
+use App\Infrastructure\Security\TokenGeneratorService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -17,6 +17,7 @@ class PasswordServiceTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         $userRepository = $this->getMockBuilder(UserRepository::class)->disableOriginalConstructor()->getMock();
         $tokenRepository = $this->getMockBuilder(PasswordResetTokenRepository::class)->disableOriginalConstructor()->getMock();
         $generator = $this->getMockBuilder(TokenGeneratorService::class)->disableOriginalConstructor()->getMock();

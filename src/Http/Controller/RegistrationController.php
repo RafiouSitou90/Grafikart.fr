@@ -2,11 +2,11 @@
 
 namespace App\Http\Controller;
 
-use App\Core\Security\TokenGeneratorService;
 use App\Domain\Auth\Authenticator;
 use App\Domain\Auth\Event\UserCreatedEvent;
 use App\Domain\Auth\User;
 use App\Http\Form\RegistrationFormType;
+use App\Infrastructure\Security\TokenGeneratorService;
 use App\Infrastructure\Social\SocialLoginService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -79,7 +79,7 @@ class RegistrationController extends AbstractController
                 'Un message avec un lien de confirmation vous a été envoyé par mail. Veuillez suivre ce lien pour activer votre compte.'
             );
 
-            return $this->redirectToRoute('register');
+            return $this->redirectToRoute('auth_login');
         } elseif ($form->isSubmitted()) {
             /** @var FormError $error */
             foreach ($form->getErrors() as $error) {
@@ -92,6 +92,7 @@ class RegistrationController extends AbstractController
         return $this->render('registration/register.html.twig', [
             'form' => $form->createView(),
             'errors' => $rootErrors,
+            'menu' => 'register',
             'oauth_registration' => $request->get('oauth'),
             'oauth_type' => $socialLoginService->getOauthType(),
         ]);

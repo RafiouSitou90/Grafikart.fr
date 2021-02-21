@@ -3,8 +3,8 @@
 namespace App\Domain\Forum\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
-use App\Core\Twig\CacheExtension\CacheableInterface;
 use App\Domain\Auth\User;
+use App\Http\Twig\CacheExtension\CacheableInterface;
 use App\Infrastructure\Spam\SpammableInterface;
 use App\Infrastructure\Spam\SpamTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Topic implements SpammableInterface, CacheableInterface
 {
+    use SpamTrait;
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -94,8 +95,6 @@ class Topic implements SpammableInterface, CacheableInterface
      * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      */
     private ?Message $lastMessage = null;
-
-    use SpamTrait;
 
     public function __construct()
     {
@@ -237,6 +236,11 @@ class Topic implements SpammableInterface, CacheableInterface
         return $this;
     }
 
+    public function getLastMessage(): ?Message
+    {
+        return $this->lastMessage;
+    }
+
     /**
      * @return Collection|Message[]
      */
@@ -245,17 +249,22 @@ class Topic implements SpammableInterface, CacheableInterface
         return $this->messages;
     }
 
-    public function getLastMessage(): ?Message
-    {
-        return $this->lastMessage;
-    }
-
     public function addMessage(Message $message): self
     {
         if (!$this->messages->contains($message)) {
             $this->messages->add($message);
             $message->setTopic($this);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param Collection|Message[] $messages
+     */
+    public function setMessages(Collection $messages): self
+    {
+        $this->messages = $messages;
 
         return $this;
     }

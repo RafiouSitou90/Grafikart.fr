@@ -14,6 +14,7 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
         $this->client = self::createClient();
         /** @var EntityManagerInterface $em */
         $em = self::$container->get(EntityManagerInterface::class);
@@ -32,7 +33,7 @@ class WebTestCase extends \Symfony\Bundle\FrameworkBundle\Test\WebTestCase
     {
         $this->client->request($method, $url, [], [], [
             'CONTENT_TYPE' => 'application/json',
-            'HTTP_Accept' => 'application/json',
+            'HTTP_ACCEPT' => 'application/json',
         ], $data ? json_encode($data) : null);
 
         return $this->client->getResponse()->getContent();

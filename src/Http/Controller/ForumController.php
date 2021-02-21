@@ -2,14 +2,15 @@
 
 namespace App\Http\Controller;
 
-use App\Core\Helper\Paginator\PaginatorInterface;
 use App\Domain\Auth\User;
 use App\Domain\Forum\Entity\Forum;
 use App\Domain\Forum\Entity\Tag;
 use App\Domain\Forum\Entity\Topic;
+use App\Domain\Forum\Repository\MessageRepository;
 use App\Domain\Forum\Repository\TagRepository;
 use App\Domain\Forum\Repository\TopicRepository;
 use App\Domain\Forum\TopicService;
+use App\Helper\Paginator\PaginatorInterface;
 use App\Http\Form\ForumTopicForm;
 use App\Http\Security\ForumVoter;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,12 +64,13 @@ class ForumController extends AbstractController
     /**
      * @Route("/forum/{id<\d+>}", name="forum_show")
      */
-    public function show(Topic $topic): Response
+    public function show(Topic $topic, MessageRepository $messageRepository): Response
     {
         $user = $this->getUser();
         if ($user) {
             $this->topicService->readTopic($topic, $user);
         }
+        $messageRepository->hydrateMessages($topic);
 
         return $this->render('forum/show.html.twig', [
             'topic' => $topic,
@@ -137,9 +139,9 @@ class ForumController extends AbstractController
         TopicRepository $topicRepository,
         \Knp\Component\Pager\PaginatorInterface $paginator
     ): Response {
-        $q = $request->get('q');
+        $q = trim($request->get('q', ''));
         if (empty($q)) {
-            $topics = [];
+            return $this->redirectToRoute('forum', [], Response::HTTP_MOVED_PERMANENTLY);
         } else {
             $page = $request->get('page', 1);
             [$items, $total] = $topicRepository->search($q, $page);

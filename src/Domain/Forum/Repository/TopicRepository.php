@@ -2,11 +2,11 @@
 
 namespace App\Domain\Forum\Repository;
 
-use App\Core\Orm\AbstractRepository;
 use App\Domain\Auth\User;
 use App\Domain\Forum\Entity\Message;
 use App\Domain\Forum\Entity\Tag;
 use App\Domain\Forum\Entity\Topic;
+use App\Infrastructure\Orm\AbstractRepository;
 use App\Infrastructure\Spam\SpammableRepositoryTrait;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
@@ -78,7 +78,7 @@ class TopicRepository extends AbstractRepository
         $query = $this->createQueryBuilder('t')
             ->where('t.spam = false')
             ->setMaxResults(20)
-            ->orderBy('t.createdAt', 'DESC');
+            ->orderBy('t.updatedAt', 'DESC');
         if ($tag) {
             $tags = [$tag];
             if ($tag->getChildren()->count() > 0) {

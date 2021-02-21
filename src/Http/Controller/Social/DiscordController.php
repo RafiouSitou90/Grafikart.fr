@@ -24,13 +24,13 @@ class DiscordController extends AbstractController
     }
 
     /**
-     * @Route("/discord/check", name="oauth_discord_check")
+     * @Route("/oauth/check/discord", name="oauth_discord_check")
      * @IsGranted("ROLE_USER")
      */
     public function check(DiscordClient $client, EntityManagerInterface $em): RedirectResponse
     {
         try {
-            /** @var DiscordResourceOwner $client */
+            /** @var DiscordResourceOwner $discordUser */
             $discordUser = $client->fetchUser();
             /** @var User $user */
             $user = $this->getUser();

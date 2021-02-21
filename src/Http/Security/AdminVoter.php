@@ -8,6 +8,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class AdminVoter extends Voter
 {
+    private string $appEnv;
+
+    public function __construct(string $appEnv)
+    {
+        $this->appEnv = $appEnv;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -25,6 +32,10 @@ class AdminVoter extends Voter
 
         if (!$user instanceof User) {
             return false;
+        }
+
+        if ('prod' === $this->appEnv) {
+            return 'Grafikart' === $user->getUsername() && 1 === $user->getId();
         }
 
         return 'Grafikart' === $user->getUsername();

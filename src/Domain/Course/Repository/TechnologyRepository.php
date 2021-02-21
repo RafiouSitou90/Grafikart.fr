@@ -2,8 +2,8 @@
 
 namespace App\Domain\Course\Repository;
 
-use App\Core\Orm\AbstractRepository;
 use App\Domain\Course\Entity\Technology;
+use App\Infrastructure\Orm\AbstractRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -75,7 +75,7 @@ class TechnologyRepository extends AbstractRepository
     {
         return $this->createQueryBuilder('t')
             ->where('LOWER(t.name) LIKE :q')
-            ->setParameter('q', "$q%")
+            ->setParameter('q', strtolower($q).'%')
             ->getQuery()
             ->getResult();
     }

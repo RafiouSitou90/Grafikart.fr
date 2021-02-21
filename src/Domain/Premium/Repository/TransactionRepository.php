@@ -2,9 +2,9 @@
 
 namespace App\Domain\Premium\Repository;
 
-use App\Core\Orm\AbstractRepository;
 use App\Domain\Auth\User;
 use App\Domain\Premium\Entity\Transaction;
+use App\Infrastructure\Orm\AbstractRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -54,5 +54,24 @@ class TransactionRepository extends AbstractRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult());
+    }
+
+    public function getMonthlyReport(int $year): array
+    {
+        return $this->createQueryBuilder('t')
+            ->select(
+                't.method as method',
+                'EXTRACT(MONTH FROM t.createdAt) as month',
+                'ROUND(SUM(t.price) * 100) / 100 as price',
+                'ROUND(SUM(t.tax) * 100) / 100 as tax',
+                'ROUND(SUM(t.fee) * 100) / 100 as fee',
+            )
+            ->groupBy('month', 't.method')
+            ->where('t.refunded = false')
+            ->andWhere('EXTRACT(YEAR FROM t.createdAt) = :year')
+            ->setParameter('year', $year)
+            ->orderBy('month', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }

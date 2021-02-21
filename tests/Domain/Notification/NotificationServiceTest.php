@@ -21,6 +21,7 @@ class NotificationServiceTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         $this->serializer = $this->getMockBuilder(SerializerInterface::class)->getMock();
         $this->em = $this->getMockBuilder(EntityManagerInterface::class)->getMock();
         $this->dispatcher = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
@@ -37,18 +38,6 @@ class NotificationServiceTest extends TestCase
             $this->isInstanceOf(NotificationCreatedEvent::class)
         );
         $this->service->notifyChannel('demo', 'Bonjour', $entity);
-    }
-
-    public function testDoNotDispatchEventTwice(): void
-    {
-        $entity = new FakeEntity(10);
-        $this->dispatcher->expects($this->once())->method('dispatch')->with(
-            $this->isInstanceOf(NotificationCreatedEvent::class)
-        );
-        $this->service->notifyChannel('demo', 'Bonjour', $entity);
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
     }
 
     public function testSentReadEvent(): void

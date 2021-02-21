@@ -4,6 +4,7 @@ namespace App\Domain\Course\Type;
 
 use App\Domain\Course\Entity\Technology;
 use App\Domain\Course\Repository\TechnologyRepository;
+use App\Http\Admin\Form\Field\TechnologiesType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -13,6 +14,7 @@ class TechnologiesTypeTest extends TestCase
 
     public function setUp(): void
     {
+        parent::setUp();
         /** @var TechnologyRepository|MockObject $repo */
         $repo = $this->getMockBuilder(TechnologyRepository::class)->disableOriginalConstructor()->getMock();
         $repo->expects($this->any())->method('findByNames')->willReturn([]);

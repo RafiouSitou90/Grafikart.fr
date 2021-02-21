@@ -2,9 +2,9 @@
 
 namespace App\Domain\Attachment\Normalizer;
 
-use App\Core\Normalizer;
 use App\Domain\Attachment\Attachment;
 use App\Infrastructure\Image\ImageResizer;
+use App\Normalizer\Normalizer;
 use Vich\UploaderBundle\Templating\Helper\UploaderHelper;
 
 class AttachmentApiNormalizer extends Normalizer
@@ -36,7 +36,8 @@ class AttachmentApiNormalizer extends Normalizer
             'createdAt' => $object->getCreatedAt()->getTimestamp(),
             'name' => "{$filename}.{$extension}",
             'size' => $object->getFileSize(),
-            'url' => $this->resizer->resize($this->uploaderHelper->asset($object), 250, 100),
+            'url' => $this->uploaderHelper->asset($object),
+            'thumbnail' => $this->resizer->resize($this->uploaderHelper->asset($object), 250, 100),
         ];
     }
 

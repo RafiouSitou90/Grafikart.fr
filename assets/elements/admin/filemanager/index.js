@@ -5,14 +5,18 @@ export default class FileManager extends HTMLElement {
   constructor () {
     super()
     this.root = this.attachShadow({ mode: 'closed' })
+  }
+
+  connectedCallback () {
     this.root.innerHTML = this.style()
     this.addEventListener('dragenter', this.onDragEnter.bind(this))
     this.addEventListener('dragleave', this.ondragleave.bind(this))
     this.addEventListener('dragover', this.onDragOver)
     this.addEventListener('drop', this.onDrop.bind(this))
+    this.apiEndpoint = this.getAttribute('data-endpoint')
     render(
       h(FileManagerComponent, {
-        apiEndpoint: '/admin/attachment',
+        apiEndpoint: this.apiEndpoint,
         dragOver: false,
         onSelectFile: this.onSelectFile.bind(this)
       }),
@@ -34,6 +38,7 @@ export default class FileManager extends HTMLElement {
   style () {
     return `<style>
     :host {
+      color: #121c42;
       display: block;
       --space: 8px;
       --accent: #457cff;
@@ -239,7 +244,8 @@ export default class FileManager extends HTMLElement {
       padding-right: var(--space-3);
     }
     td:last-child {
-      padding-right: 0;
+    width: 60px !important;
+      padding-right: 0!important;
     }
     td img {
       cursor: pointer;
@@ -252,7 +258,7 @@ export default class FileManager extends HTMLElement {
     tr:hover td {
       background-color: #f8fafb;
     }
-    .delete svg {
+    td:last-child svg {
       width: 16px;
       height: 16px;
       color: #c6d0d6;
@@ -260,6 +266,9 @@ export default class FileManager extends HTMLElement {
     }
     .delete:hover svg {
       color: #FB4635;
+    }
+    .copy:hover svg {
+      color: var(--contrast);
     }
     .loader {
        position:absolute;
@@ -285,7 +294,7 @@ export default class FileManager extends HTMLElement {
     e.preventDefault()
     render(
       h(FileManagerComponent, {
-        apiEndpoint: '/admin/attachment',
+        apiEndpoint: this.apiEndpoint,
         dragOver: true,
         onSelectFile: this.onSelectFile.bind(this)
       }),
@@ -298,7 +307,7 @@ export default class FileManager extends HTMLElement {
     e.preventDefault()
     render(
       h(FileManagerComponent, {
-        apiEndpoint: '/admin/attachment',
+        apiEndpoint: this.apiEndpoint,
         dragOver: false,
         onSelectFile: this.onSelectFile.bind(this)
       }),
@@ -314,7 +323,7 @@ export default class FileManager extends HTMLElement {
   onDrop () {
     render(
       h(FileManagerComponent, {
-        apiEndpoint: '/admin/attachment',
+        apiEndpoint: this.apiEndpoint,
         dragOver: false,
         onSelectFile: this.onSelectFile.bind(this)
       }),

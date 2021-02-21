@@ -2,6 +2,7 @@
 
 namespace App\Tests\Http\Controller\Course;
 
+use App\Domain\Auth\User;
 use App\Domain\Course\Entity\Course;
 use App\Tests\FixturesTrait;
 use App\Tests\WebTestCase;
@@ -64,11 +65,25 @@ class CourseControllerTest extends WebTestCase
 
     public function testDownloadVideoAuthenticatedWithoutPremium(): void
     {
-        $data = $this->loadFixtures(['courses']);
-        $this->login($data['user1']);
         /** @var Course $course */
-        $course = $data['course1'];
+        /** @var User $user */
+        ['user1' => $user, 'course1' => $course] = $this->loadFixtures(['courses', 'users']);
+        $this->login($user);
         $this->client->request('GET', "/tutoriels/{$course->getId()}/video");
         $this->assertResponseRedirects('/premium');
+    }
+
+    public function testRedirectLegacyCourses(): void
+    {
+        /** @var Course $course */
+        ['course1' => $course] = $this->loadFixtures(['courses']);
+        $this->client->request(
+            'GET',
+            "/tutoriels/mysql/{$course->getSlug()}-{$course->getId()}"
+        );
+        $this->assertResponseRedirects(
+            "/tutoriels/{$course->getSlug()}-{$course->getId()}",
+            Response::HTTP_MOVED_PERMANENTLY
+        );
     }
 }

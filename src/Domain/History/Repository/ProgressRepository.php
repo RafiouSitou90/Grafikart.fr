@@ -2,12 +2,13 @@
 
 namespace App\Domain\History\Repository;
 
-use App\Core\Orm\AbstractRepository;
 use App\Domain\Application\Entity\Content;
 use App\Domain\Auth\User;
 use App\Domain\Course\Entity\Course;
 use App\Domain\Course\Entity\Formation;
 use App\Domain\History\Entity\Progress;
+use App\Infrastructure\Orm\AbstractRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -20,12 +21,40 @@ class ProgressRepository extends AbstractRepository
         parent::__construct($registry, Progress::class);
     }
 
+    public function queryAllForUser(User $user): QueryBuilder
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.content', 'c')
+            ->addSelect('c')
+            ->where('(c INSTANCE OF '.Course::class.' OR c INSTANCE OF '.Formation::class.')')
+            ->andWhere('p.author = :user')
+            ->setParameter('user', $user->getId());
+    }
+
     public function findOneByContent(User $user, Content $content): ?Progress
     {
         return $this->findOneBy([
             'content' => $content,
             'author' => $user,
         ]);
+    }
+
+    public function findLastForUser(User $user): array
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.content', 'c')
+            ->addSelect('c')
+            ->where('p.author = :user')
+            ->andWhere('(c INSTANCE OF '.Course::class.' OR c INSTANCE OF '.Formation::class.')')
+            ->andWhere('p.progress < :progress')
+            ->orderBy('p.updatedAt', 'DESC')
+            ->setMaxResults(4)
+            ->setParameters([
+                'user' => $user,
+                'progress' => Progress::TOTAL,
+            ])
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -48,23 +77,6 @@ class ProgressRepository extends AbstractRepository
             ->getResult();
     }
 
-    public function findLastForUser(User $user): array
-    {
-        return $this->createQueryBuilder('p')
-            ->leftJoin('p.content', 'c')
-            ->where('p.author = :user')
-            ->andWhere('(c INSTANCE OF '.Course::class.' OR c INSTANCE OF '.Formation::class.')')
-            ->andWhere('p.progress < :progress')
-            ->orderBy('p.updatedAt', 'DESC')
-            ->setMaxResults(4)
-            ->setParameters([
-                'user' => $user,
-                'progress' => Progress::TOTAL,
-            ])
-            ->getQuery()
-            ->getResult();
-    }
-
     /**
      * Trouve les ids lu parmis la liste passée en paramètre.
      *
@@ -72,7 +84,7 @@ class ProgressRepository extends AbstractRepository
      */
     public function findFinishedIdWithin(User $user, array $ids): array
     {
-        return array_map(fn (Progress $p) => $p->getContent()->getId(), $this->createQueryBuilder('p')
+        return array_map(fn (Progress $p) => $p->getContent()->getId() ?: 0, $this->createQueryBuilder('p')
             ->where('p.content IN (:ids)')
             ->andWhere('p.author = :user')
             ->andWhere('p.progress = :total')

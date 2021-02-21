@@ -2,20 +2,20 @@
 
 namespace App\Http\Form;
 
-use App\Core\Type\DateTimeType;
-use App\Core\Type\EditorType;
-use App\Core\Type\SwitchType;
 use App\Domain\Attachment\Attachment;
 use App\Domain\Attachment\Type\AttachmentType;
 use App\Domain\Auth\User;
 use App\Domain\Course\Entity\CursusCategory;
 use App\Domain\Course\Entity\Formation;
-use App\Domain\Course\Type\TechnologiesType;
 use App\Domain\Forum\Entity\Tag;
 use App\Http\Admin\Form\Field\CursusCategoryChoiceType;
 use App\Http\Admin\Form\Field\ForumTagChoiceType;
+use App\Http\Admin\Form\Field\TechnologiesType;
 use App\Http\Admin\Form\Field\TechnologyChoiceType;
 use App\Http\Admin\Form\Field\UserChoiceType;
+use App\Http\Type\DateTimeType;
+use App\Http\Type\EditorType;
+use App\Http\Type\SwitchType;
 use DateTimeInterface;
 use ReflectionClass;
 use Symfony\Component\Form\AbstractType;

@@ -2,6 +2,7 @@
 
 namespace App\Tests\Http\Api;
 
+use App\Domain\Auth\User;
 use App\Domain\Comment\Comment;
 use App\Http\Api\Resource\CommentResource;
 use App\Tests\ApiTestCase;
@@ -22,7 +23,7 @@ class CommentApiTest extends ApiTestCase
     {
         $fixtures = $this->loadFixtures(['comments']);
         $contentId = $fixtures['post1']->getId();
-        $response = $this->client->request('GET', '/api/comments?content='.$contentId);
+        $response = $this->client->request('GET', "/api/comments?content=$contentId");
         $this->assertResponseIsSuccessful();
         $this->assertCount(7, $response->toArray());
         $this->assertMatchesResourceCollectionJsonSchema(CommentResource::class, 'GET', 'json');
@@ -44,17 +45,18 @@ class CommentApiTest extends ApiTestCase
         $fixtures = $this->loadFixtures(['comments']);
         $response = $this->client->request('POST', '/api/comments', [
             'json' => [
-                'content' => 'Hello world !',
-                'email' => 'johnfake',
+                'content' => 'Hel',
                 'username' => 'John Doe',
                 'target' => $fixtures['post1']->getId(),
             ],
         ]);
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
         $this->assertJsonContains([
-            'violations' => [[
-                'propertyPath' => 'email',
-            ]],
+            'violations' => [
+                [
+                    'propertyPath' => 'content',
+                ],
+            ],
         ]);
     }
 
@@ -64,19 +66,20 @@ class CommentApiTest extends ApiTestCase
         $this->client->request('POST', '/api/comments', [
             'json' => [
                 'content' => '         ',
-                'email' => 'john@fake.fr',
                 'username' => '        ',
                 'target' => $fixtures['post1']->getId(),
             ],
         ]);
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
         $this->assertJsonContains([
-            'violations' => [[
-                'propertyPath' => 'content',
-            ],
+            'violations' => [
                 [
                     'propertyPath' => 'content',
-                ], ],
+                ],
+                [
+                    'propertyPath' => 'content',
+                ],
+            ],
         ]);
     }
 
@@ -86,12 +89,33 @@ class CommentApiTest extends ApiTestCase
         $this->client->request('POST', '/api/comments', [
             'json' => [
                 'content' => 'Hello world !',
-                'email' => 'john@fake.fr',
                 'username' => 'John Doe',
                 'target' => $fixtures['post1']->getId(),
             ],
         ]);
         $this->assertResponseIsSuccessful();
+    }
+
+    public function testCreateWithUsedUsername()
+    {
+        $fixtures = $this->loadFixtures(['comments', 'users']);
+        /** @var User $user */
+        $user = $fixtures['user1'];
+        $this->client->request('POST', '/api/comments', [
+            'json' => [
+                'content' => 'Hello world !',
+                'username' => $user->getUsername(),
+                'target' => $fixtures['post1']->getId(),
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $this->assertJsonContains([
+            'violations' => [
+                [
+                    'propertyPath' => 'username',
+                ],
+            ],
+        ]);
     }
 
     public function testCreateWithoutAuthFail()
@@ -103,7 +127,7 @@ class CommentApiTest extends ApiTestCase
                 'target' => $fixtures['post1']->getId(),
             ],
         ]);
-        $this->assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     public function testCreateWithAuth()

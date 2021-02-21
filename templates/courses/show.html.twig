@@ -10,6 +10,14 @@
 {% endif %}
 {% endblock %}
 
+{% block meta %}
+  <meta property="og:image" content="{{ app.request.getUriForPath(image_url_raw(course.youtubeThumbnail)) }}"/>
+  <meta property="og:created_time" content="{{ course.createdAt | date('c') }}"/>
+  <meta property="og:type" content="video.other"/>
+  <meta property="og:duration" content="{{ course.duration }}"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+{% endblock %}
+
 {% block body %}
 
   {% cache [course, user_premium, course.isScheduled] %}
@@ -35,7 +43,7 @@
 
     <div class="container {{ course.formation ? 'course-top-sidebar' : '' }}">
       {% if course.scheduled and not user_premium %}
-        <div class="course-countdown" style="background-image: url({{ image_url(course.image) }})">
+        <div class="course-countdown" style="background-image: url({{ image_url(course.image, 1330, 750) }})">
           <div>
             <em>Disponible dans</em>
             <span class="course-countdown_timer">{{ course.createdAt | countdown }}</span>
@@ -70,7 +78,12 @@
           poster="{{ image_url(course.image, 1330, 750) }}"
           button="#chapter{{ course.id }} play-button"
           duration="{{ course.duration | duration }}"
-          class="shadow"></youtube-player>
+          class="shadow">
+          <a href="https://www.youtube.com/watch?v={{ course.youtubeId }}" target="_blank" rel="noopener" class="course__placeholder">
+            <span>Voir la vidéo</span>
+            <img src="{{ image_url(course.image, 1330, 750) }}" width="1330" height="750"/>
+          </a>
+        </youtube-player>
       </progress-tracker>
       {% endif %}
       {% if course.formation %}
@@ -96,19 +109,19 @@
         </div>
         <div>
           {% if course.demo %}
-            <a href="{{ course.demo }}" class="pill uppercase" target="_blank"
+            <a href="{{ course.demo }}" class="pill" target="_blank"
                title="Démonstration du tutoriel {{ course.title }}">
               {{ icon('lines') }}
               Voir la démo
             </a>
           {% endif %}
           {% if course.source is not empty %}
-            <a href="{{ path('course_download_source', {id: course.id}) }}" class="pill uppercase" data-turbolinks="false" {% if user_premium %}download="Sources {{ course.title }}" {% endif %}>
+            <a href="{{ path('course_download_source', {id: course.id}) }}" class="pill" data-turbolinks="false" {% if user_premium %}download="Sources {{ course.title }}" {% endif %}>
               {{ icon('lines') }}
               Télécharger les sources
             </a>
           {% endif %}
-          <a href="{{ path('course_download_video', {id: course.id}) }}" class="pill uppercase" data-turbolinks="false" {% if user_premium %}download="{{ course.title }}" {% endif %}>
+          <a href="{{ path('course_download_video', {id: course.id}) }}" class="pill" data-turbolinks="false" {% if user_premium %}download="{{ course.title }}" {% endif %}>
             {{ icon('video') }}
             Télécharger la vidéo
           </a>
@@ -172,7 +185,7 @@
                        style="width: 50px;border-radius: 50px;">
                   <div style="width: 100%; margin-left: 20px;">
                     <strong style="font-weight: bold;">Auteur : </strong><br>
-                    <a title="Grafikart" class="author_name" href="{{ path(course.author) }}">{{ course.author.username }}</a>
+                    <a title="{{ course.author.username }}" class="author_name" href="{{ path(course.author) }}">{{ course.author.username }}</a>
                   </div>
                 </div>
               </div>
@@ -185,7 +198,15 @@
                   <img src="/images/social/facebook.svg" alt="">
                 </a>
               </div>
-              <admin-edit hidden></admin-edit>
+              <div class="stack" style="--gap:1;">
+                <div>
+                  <a href="{{ path('revision', {id: course.id}) }}" class="btn-secondary">
+                    {{ icon('edit') }}
+                    Proposer une correction
+                  </a>
+                </div>
+                <admin-edit hidden></admin-edit>
+              </div>
             </div>
           </div>
         </div>
@@ -202,6 +223,8 @@
 
   {% if course.formation and app.user %}
     {{ show_history(course.formation.courses) }}
+  {% elseif app.user  %}
+    {{ show_history([course]) }}
   {% endif %}
 
 {% endblock %}
