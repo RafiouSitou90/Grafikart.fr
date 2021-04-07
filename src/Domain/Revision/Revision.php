@@ -14,6 +14,10 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 class Revision
 {
+    const PENDING = 0;
+    const ACCEPTED = 1;
+    const REJECTED = -1;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -37,12 +41,17 @@ class Revision
      * @ORM\Column(type="text")
      * @Assert\NotBlank()
      */
-    private ?string $content = null;
+    private string $content = '';
 
     /**
      * @ORM\Column(type="datetime")
      */
     private ?\DateTimeInterface $createdAt = null;
+
+    /**
+     * @ORM\Column(type="integer", length=1, options={"default":"0"})
+     */
+    private int $status = self::PENDING;
 
     public function getId(): ?int
     {
@@ -73,12 +82,12 @@ class Revision
         return $this;
     }
 
-    public function getContent(): ?string
+    public function getContent(): string
     {
         return $this->content;
     }
 
-    public function setContent(?string $content): self
+    public function setContent(string $content): self
     {
         $this->content = $content;
 
@@ -93,6 +102,18 @@ class Revision
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
+    }
+
+    public function setStatus(int $status): Revision
+    {
+        $this->status = $status;
 
         return $this;
     }

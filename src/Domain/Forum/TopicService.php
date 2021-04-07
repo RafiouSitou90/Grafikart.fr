@@ -89,7 +89,7 @@ class TopicService
         if ($user->getForumReadTime()) {
             $unreadTopics = [];
             foreach ($topics as $topic) {
-                if ($topic->getUpdatedAt() < $user->getForumReadTime()) {
+                if ($topic->getUpdatedAt() <= $user->getForumReadTime()) {
                     $ids[] = $topic->getId();
                 } else {
                     $unreadTopics[] = $topic;
@@ -146,5 +146,22 @@ class TopicService
         $message->getTopic()->setSolved(true);
         $this->dispatcher->dispatch(new TopicResolvedEvent($message));
         $this->em->flush();
+    }
+
+    /**
+     * Définit si l'utilisateur est abonné ou non au topic
+     */
+    public function isUserSubscribedToTopic(Topic $topic, ?User $user): ?bool
+    {
+        if ($user === null || $user->getId() === $topic->getAuthor()->getId()) {
+            return null;
+        }
+        $notification = null;
+        foreach ($topic->getMessages() as $message) {
+            if ($message->getAuthor()->getId() === $user->getId()) {
+                $notification = $message->hasNotification();
+            }
+        }
+        return $notification;
     }
 }
